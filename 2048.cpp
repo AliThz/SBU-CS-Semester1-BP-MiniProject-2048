@@ -63,13 +63,13 @@ void displayBoard();
 void displayBoardTable();
 void makeMove();
 void moveUp();
-void mergeSimillarTilesUp();
+void mergeSimillarTilesUp(bool &);
 void moveDown();
-void mergeSimillarTilesDown();
+void mergeSimillarTilesDown(bool &);
 void moveRight();
-void mergeSimillarTilesRight();
+void mergeSimillarTilesRight(bool &);
 void moveLeft();
-void mergeSimillarTilesLeft();
+void mergeSimillarTilesLeft(bool &);
 void saveData();
 bool checkIfAnyMovesLeft();
 bool checkIfFinished();
@@ -79,6 +79,8 @@ int generateRandomNumber();
 void insertRandomNumber();
 void fetchData();
 void displayLeaderBoard();
+void ShowConsoleCursor(bool);
+void deletePointers();
 void exitBoard();
 
 Game *game;
@@ -102,7 +104,15 @@ void generateBoard()
     cin >> (*game).boardSize;
     cout << RESET_COLOR;
 
-    if ((*game).boardSize < 2)
+    if (cin.fail())
+    {
+        cerr << RED_COLOR << "Please enter a number" << RESET_COLOR << endl;
+        Sleep(500);
+        cin.clear();
+        cin.ignore(256, '\n');
+        generateBoard();
+    }
+    else if ((*game).boardSize < 2)
     {
         cout << RED_COLOR << "Please enter a bigger size" << RESET_COLOR << endl;
         Sleep(500);
@@ -117,6 +127,7 @@ void generateBoard()
 void displayMenu()
 {
     system("cls");
+    ShowConsoleCursor(false);
 
     cout << BOLDON_STYLE << GREEN_COLOR << "---  2 0 4 8  ---" << RESET_COLOR << BOLDOFF_STYLE << endl
          << BLUE_COLOR
@@ -338,9 +349,7 @@ void displayBoardTable()
 
                 int tileValue = (*game).board[((i - 1) / 3)][(j / 3) - 1];
                 if ((i % 3 == 1) && tileValue != 0)
-                    // cout << "\u2551" << setw(5) << 4 << "    ";
                     cout << "\u2551" << colorTile(tileValue) << setw(5) << tileValue << BLUE_COLOR << "    ";
-                // cout << "\u2551" << setw(5) << i << "*" << j << "    ";
                 else
                     cout << "\u2551"
                          << "         ";
@@ -398,6 +407,8 @@ void makeMove()
 
 void moveUp()
 {
+    bool flag = true;
+
     for (int k = 0; k < (*game).boardSize - 1; k++)
     {
         for (int i = 0; i < (*game).boardSize - 1; i++)
@@ -405,7 +416,8 @@ void moveUp()
                 if ((*game).board[i][j] == 0)
                     swap((*game).board[i][j], (*game).board[i + 1][j]);
 
-        mergeSimillarTilesUp();
+        if (flag)
+            mergeSimillarTilesUp(flag);
     }
 
     if (!checkIfBoardIsFull())
@@ -414,7 +426,7 @@ void moveUp()
     displayBoard();
 }
 
-void mergeSimillarTilesUp()
+void mergeSimillarTilesUp(bool &flag)
 {
     for (int j = 0; j < (*game).boardSize; j++)
     {
@@ -422,6 +434,8 @@ void mergeSimillarTilesUp()
         {
             if ((*game).board[i][j] == (*game).board[i + 1][j])
             {
+                flag = false;
+                flag = true;
                 (*game).board[i][j] *= 2;
                 (*game).board[i + 1][j] = 0;
                 (*game).score += (*game).board[i][j];
@@ -432,6 +446,8 @@ void mergeSimillarTilesUp()
 
 void moveDown()
 {
+    bool flag = true;
+
     for (int k = 0; k < (*game).boardSize - 1; k++)
     {
         for (int i = (*game).boardSize - 1; i > 0; i--)
@@ -439,7 +455,8 @@ void moveDown()
                 if ((*game).board[i][j] == 0)
                     swap((*game).board[i][j], (*game).board[i - 1][j]);
 
-        mergeSimillarTilesDown();
+        if (flag)
+            mergeSimillarTilesDown(flag);
     }
     if (!checkIfBoardIsFull())
 
@@ -448,7 +465,7 @@ void moveDown()
     displayBoard();
 }
 
-void mergeSimillarTilesDown()
+void mergeSimillarTilesDown(bool &flag)
 {
     for (int j = 0; j < (*game).boardSize; j++)
     {
@@ -456,6 +473,7 @@ void mergeSimillarTilesDown()
         {
             if ((*game).board[i][j] == (*game).board[i - 1][j])
             {
+                flag = false;
                 (*game).board[i][j] *= 2;
                 (*game).board[i - 1][j] = 0;
                 (*game).score += (*game).board[i][j];
@@ -466,6 +484,8 @@ void mergeSimillarTilesDown()
 
 void moveRight()
 {
+    bool flag = true;
+
     for (int k = 0; k < (*game).boardSize - 1; k++)
     {
         for (int i = 0; i < (*game).boardSize; i++)
@@ -473,7 +493,8 @@ void moveRight()
                 if ((*game).board[i][j] == 0)
                     swap((*game).board[i][j], (*game).board[i][j - 1]);
 
-        mergeSimillarTilesRight();
+        if (flag)
+            mergeSimillarTilesRight(flag);
     }
 
     if (!checkIfBoardIsFull())
@@ -482,7 +503,7 @@ void moveRight()
     displayBoard();
 }
 
-void mergeSimillarTilesRight()
+void mergeSimillarTilesRight(bool &flag)
 {
     for (int i = 0; i < (*game).boardSize; i++)
     {
@@ -490,6 +511,7 @@ void mergeSimillarTilesRight()
         {
             if ((*game).board[i][j] == (*game).board[i][j - 1])
             {
+                flag = false;
                 (*game).board[i][j] *= 2;
                 (*game).board[i][j - 1] = 0;
                 (*game).score += (*game).board[i][j];
@@ -500,6 +522,8 @@ void mergeSimillarTilesRight()
 
 void moveLeft()
 {
+    bool flag = true;
+
     for (int k = 0; k < (*game).boardSize - 1; k++)
     {
         for (int i = 0; i < (*game).boardSize; i++)
@@ -507,7 +531,8 @@ void moveLeft()
                 if ((*game).board[i][j - 1] == 0)
                     swap((*game).board[i][j - 1], (*game).board[i][j]);
 
-        mergeSimillarTilesLeft();
+        if (flag)
+            mergeSimillarTilesLeft(flag);
     }
 
     if (!checkIfBoardIsFull())
@@ -516,7 +541,7 @@ void moveLeft()
     displayBoard();
 }
 
-void mergeSimillarTilesLeft()
+void mergeSimillarTilesLeft(bool &flag)
 {
     for (int i = 0; i < (*game).boardSize; i++)
     {
@@ -524,6 +549,7 @@ void mergeSimillarTilesLeft()
         {
             if ((*game).board[i][j] == (*game).board[i][j + 1])
             {
+                flag = false;
                 (*game).board[i][j] *= 2;
                 (*game).board[i][j + 1] = 0;
                 (*game).score += (*game).board[i][j];
@@ -539,7 +565,7 @@ void saveData()
     {
         file << (*game).score << " - " << (*game).playerName << " - " << (*game).boardSize << "\n";
         file.close();
-        // cout << "String successfully written to the file." << endl;
+        deletePointers();
     }
     else
     {
@@ -680,23 +706,26 @@ void fetchData()
 
         sort(games, games + sizeof(games) / sizeof(games[0]), [](const Game &game1, const Game &game2)
              {
-                            int result = 0;
-                            if (game2.score < game1.score && game1.boardSize == game2.boardSize)
-                                result = 1;
-                            return result; });
+                int result = 0;
+                if (game2.score < game1.score)
+                    result = 1;
+                return result; });
 
         cout << GREEN_COLOR
-             << setw(15) << "Score"
+             << setw(8) << left << "Rank" << setw(8)
              << "  |  "
-             << setw(15) << "Player Name"
+             << setw(8) << left << "Score" << setw(8)
              << "  |  "
-             << setw(15) << "Board Size" << RESET_COLOR << endl;
+             << setw(8) << left << "Name" << setw(8)
+             << "  |  "
+             << setw(8) << left << "Board Size" << setw(8) << RESET_COLOR << endl;
 
         for (int i = 0; i < l - 1; i++)
             cout << BLUE_COLOR
-                 << setw(15) << games[i].score << "  |  "
-                 << setw(15) << games[i].playerName << "  |  "
-                 << setw(15) << games[i].boardSize << RESET_COLOR << endl;
+                 << setw(8) << left << i + 1 << setw(8) << "  |  "
+                 << setw(8) << left << games[i].score << setw(8) << "  |  "
+                 << setw(8) << left << games[i].playerName << setw(8) << "  |  "
+                 << setw(8) << left << games[i].boardSize << setw(8) << RESET_COLOR << endl;
 
         file.close();
     }
@@ -732,6 +761,25 @@ void displayLeaderBoard()
         displayLeaderBoard();
         break;
     }
+}
+
+void ShowConsoleCursor(bool showFlag)
+{
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    CONSOLE_CURSOR_INFO cursorInfo;
+
+    GetConsoleCursorInfo(out, &cursorInfo);
+    cursorInfo.bVisible = showFlag;
+    SetConsoleCursorInfo(out, &cursorInfo);
+}
+
+void deletePointers()
+{
+    for (int i = 0; i < (*game).boardSize; i++)
+        delete[] (*game).board[i];
+
+    delete[] (*game).board;
 }
 
 void exitBoard()
